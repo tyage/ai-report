@@ -34,14 +34,14 @@ Puzzle.prototype = {
 				var piece = this.pieces[i][j],
 					correct = i * Puzzle.WIDTH + j + 1,
 					currentPos = {
-						x: (correct-1) % 3,
-						y: parseInt(correct / 3)
+						x: (correct - 1) % 3,
+						y: parseInt((correct - 1) / 3)
 					},
 					correctPos = {
-						x: (piece-1) % 3,
-						y: parseInt(piece / 3)
+						x: (piece - 1) % 3,
+						y: parseInt((piece - 1) / 3)
 					};
-				distance += Math.sqrt(Math.pow(correctPos.x-currentPos.x, 2) + Math.pow(correctPos.y-currentPos.y, 2));
+				distance += Math.abs(correctPos.x - currentPos.x) + Math.abs(correctPos.y - currentPos.y);
 			}
 		}
 		return distance;
@@ -159,7 +159,7 @@ var step = function() {
 	}
 
 	open.sort(function(a, b) {
-		return a.f() > b.f();
+		return a.f() - b.f();
 	});
 	var s = open.shift();
 	closed.push(s);
@@ -186,7 +186,7 @@ var draw = function() {
 	var nexts = [first],
 		currents,
 		ctx = document.getElementById('result').getContext('2d');
-	ctx.clearRect(document.getElementById('result').width, document.getElementById('result').height);
+	ctx.clearRect(0, 0, document.getElementById('result').width, document.getElementById('result').height);
 	while (nexts.length > 0) {
 		currents = Array.apply(null, nexts);
 		nexts = [];
