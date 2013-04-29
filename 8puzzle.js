@@ -205,7 +205,7 @@ var draw = function() {
 };
 
 // here is the first pieces
-var first = new Puzzle([[4,1,2],[Puzzle.SPACE,6,3],[7,5,8]], 0);
+var first = new Puzzle([[1,Puzzle.SPACE,3],[4,2,8],[7,6,5]], 0);
 open.push(first);
 /*
 var timer = setInterval(function() {
@@ -213,7 +213,7 @@ var timer = setInterval(function() {
 		clearInterval(timer);
 	}
 	draw();
-}, 1000);
+}, 300);
 */
 while (!step()) {}
 
