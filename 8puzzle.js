@@ -10,7 +10,8 @@ Puzzle.WIDTH = 3;
 Puzzle.HEIGHT = 3;
 Puzzle.prototype = {
 	f: function() {
-		return this.g() + this.h2();
+		return this.g() + this.h1();
+		//return this.g() + this.h2();
 	},
 	g: function() {
 		return this.distance;
@@ -150,43 +151,100 @@ Puzzle.prototype = {
 	}
 };
 
-var open = [],
-	closed = [];
+var Astar = function(first) {
+	var open = [],
+		closed = [];
+	open.push(first);
+	
+	var step = function() {
+		if (open.length === 0) {
+			return true;
+		}
 
-var step = function() {
-	if (open.length === 0) {
-		return true;
-	}
-
-	open.sort(function(a, b) {
-		return a.f() - b.f();
-	});
-	var s = open.shift();
-	closed.push(s);
-
-	for (var i=0;i<4;++i) {
-		var pieces = s.move({
-			x: [-1, 0, 1, 0][i],
-			y: [0, -1, 0, 1][i]
+		open.sort(function(a, b) {
+			return a.f() - b.f();
 		});
-		if (pieces && (!s.parent || !s.parent.matchPieces(pieces))) {
-			var child = new Puzzle(pieces, s.distance + 1);
-			child.parent = s;
-			s.children.push(child);
-			open.push(child);
-			if (child.isFinished()) {
-				return true;
+		var s = open.shift();
+		closed.push(s);
+
+		for (var i=0;i<4;++i) {
+			var pieces = s.move({
+				x: [-1, 0, 1, 0][i],
+				y: [0, -1, 0, 1][i]
+			});
+			if (pieces && (!s.parent || !s.parent.matchPieces(pieces))) {
+				var child = new Puzzle(pieces, s.distance + 1);
+				child.parent = s;
+				s.children.push(child);
+				open.push(child);
+				if (child.isFinished()) {
+					return true;
+				}
 			}
 		}
-	}
 
-	return false;
+		return false;
+	};
+	
+	//while (!step()) {}
+	var timer = setInterval(function() {
+		if (step()) {
+			clearInterval(timer);
+		}
+		draw(first);
+	}, 100);
 };
-var draw = function() {
-	var nexts = [first],
+var IDAstar = function(first) {
+	var open = [],
+		closed = [],
+		cutoff = 0;
+	
+	var step = function() {
+		if (open.length === 0) {
+			++cutoff;
+			open = [first];
+			return false;
+		}
+
+		var s;
+		while (s = open.pop()) {
+			if (s.isFinished()) {
+				return true;
+			}
+			
+			for (var i=0;i<4;++i) {
+				var pieces = s.move({
+					x: [-1, 0, 1, 0][i],
+					y: [0, -1, 0, 1][i]
+				});
+				var child = new Puzzle(pieces, s.distance + 1);
+				if (pieces && (!s.parent || !s.parent.matchPieces(pieces)) && child.f() <= cutoff) {
+					child.parent = s;
+					s.children.push(child);
+					open.push(child);
+				}
+			}
+		}
+	};
+
+	while (!step()) {}
+	/*
+	var timer = setInterval(function() {
+		if (step()) {
+			clearInterval(timer);
+		}
+		draw(first);
+	}, 100);
+	*/
+};
+var draw = function(first) {
+	var nexts = [],
 		currents,
-		ctx = document.getElementById('result').getContext('2d');
-	ctx.clearRect(0, 0, document.getElementById('result').width, document.getElementById('result').height);
+		elm = document.getElementById('result'),
+		ctx = elm.getContext('2d');
+	ctx.clearRect(0, 0, elm.width, elm.height);
+	nexts.push(first);
+	
 	while (nexts.length > 0) {
 		currents = Array.apply(null, nexts);
 		nexts = [];
@@ -205,18 +263,10 @@ var draw = function() {
 };
 
 // here is the first pieces
-var first = new Puzzle([[1,Puzzle.SPACE,3],[4,2,8],[7,6,5]], 0);
-open.push(first);
-/*
-var timer = setInterval(function() {
-	if (step()) {
-		clearInterval(timer);
-	}
-	draw();
-}, 300);
-*/
-while (!step()) {}
+var first = new Puzzle([[1,3,Puzzle.SPACE],[4,2,8],[7,6,5]], 0);
+Astar(first);
+//IDAstar(first);
 
 // draw how to solve the puzzle
-window.addEventListener('load', draw);
+window.addEventListener('load', function() {draw(first)});
 })();
