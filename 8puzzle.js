@@ -5,12 +5,12 @@ var Puzzle = function(pieces, distance) {
 	this.children = [];
 	this.parent = null;
 };
-Puzzle.SPACE = 9;
 Puzzle.WIDTH = 3;
 Puzzle.HEIGHT = 3;
+Puzzle.SPACE = 9;
 Puzzle.prototype = {
 	f: function() {
-		return this.g() + this.h1();
+		return this.g() + this.h2();
 		//return this.g() + this.h2();
 	},
 	g: function() {
@@ -22,7 +22,7 @@ Puzzle.prototype = {
 		for (var i=0;i<Puzzle.HEIGHT;++i) {
 			for (var j=0;j<Puzzle.WIDTH;++j) {
 				var correct = i * Puzzle.WIDTH + j + 1;
-				(this.pieces[i][j] !== correct && this.pieces[i][j] !== Puzzle.SPACE) && ++fail;
+				this.pieces[i][j] !== correct && ++fail;
 			}
 		}
 		return fail;
@@ -186,13 +186,15 @@ var Astar = function(first) {
 		return false;
 	};
 	
-	//while (!step()) {}
+	while (!step()) {}
+	/*
 	var timer = setInterval(function() {
 		if (step()) {
 			clearInterval(timer);
 		}
 		draw(first);
 	}, 100);
+	*/
 };
 var IDAstar = function(first) {
 	var open = [],
@@ -265,7 +267,6 @@ var draw = function(first) {
 // here is the first pieces
 var first = new Puzzle([[1,3,Puzzle.SPACE],[4,2,8],[7,6,5]], 0);
 Astar(first);
-//IDAstar(first);
 
 // draw how to solve the puzzle
 window.addEventListener('load', function() {draw(first)});
