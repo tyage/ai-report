@@ -105,8 +105,8 @@ Puzzle.prototype = {
 		return true;
 	},
 	draw: function(ctx, pos) {
-		var x = pos * 90 + 20,
-			y = this.distance * 80,
+		var x = pos * 110 + 40,
+			y = this.distance * 80 + 10,
 			width = 60,
 			height = 60;
 		this.center = {
@@ -137,7 +137,8 @@ Puzzle.prototype = {
 			}
 		}
 
-		ctx.fillText('('+parseInt(this.f())+')', x - 20, y + 10);
+		ctx.fillText(this.stepCount, x - 10, y);
+		ctx.fillText('f(n)='+parseInt(this.f()), x - 40, y + 10);
 
 		if (this.parent) {
 			ctx.moveTo(this.center.x, this.center.y - width / 2);
@@ -156,7 +157,9 @@ var Astar = function(first) {
 		closed = [];
 	open.push(first);
 	
+	var stepCount = 0;
 	var step = function() {
+		stepCount++;
 		if (open.length === 0) {
 			return true;
 		}
@@ -174,6 +177,7 @@ var Astar = function(first) {
 			});
 			if (pieces && (!s.parent || !s.parent.matchPieces(pieces))) {
 				var child = new Puzzle(pieces, s.distance + 1);
+				child.stepCount = stepCount;
 				child.parent = s;
 				s.children.push(child);
 				open.push(child);
@@ -187,20 +191,21 @@ var Astar = function(first) {
 	};
 	
 	while (!step()) {}
-	/*
+/*
 	var timer = setInterval(function() {
 		if (step()) {
 			clearInterval(timer);
 		}
 		draw(first);
-	}, 100);
-	*/
+	}, 1000);
+*/
 };
 var IDAstar = function(first) {
 	var open = [],
 		closed = [],
 		cutoff = 0;
 	
+	var stepCount = 0;
 	var step = function() {
 		if (open.length === 0) {
 			++cutoff;
@@ -221,6 +226,7 @@ var IDAstar = function(first) {
 				});
 				var child = new Puzzle(pieces, s.distance + 1);
 				if (pieces && (!s.parent || !s.parent.matchPieces(pieces)) && child.f() <= cutoff) {
+					child.stepCount = stepCount;
 					child.parent = s;
 					s.children.push(child);
 					open.push(child);
@@ -230,14 +236,14 @@ var IDAstar = function(first) {
 	};
 
 	while (!step()) {}
-	/*
+/*
 	var timer = setInterval(function() {
 		if (step()) {
 			clearInterval(timer);
 		}
 		draw(first);
 	}, 100);
-	*/
+*/
 };
 var draw = function(first) {
 	var nexts = [],
