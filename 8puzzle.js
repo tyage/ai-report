@@ -4,13 +4,14 @@ var Puzzle = function(pieces, distance) {
 	this.distance = distance;
 	this.children = [];
 	this.parent = null;
+	this.stepCount = 0;
 };
 Puzzle.WIDTH = 3;
 Puzzle.HEIGHT = 3;
 Puzzle.SPACE = 9;
 Puzzle.prototype = {
 	f: function() {
-		return this.g() + this.h2();
+		return this.g() + this.h1();
 		//return this.g() + this.h2();
 	},
 	g: function() {
@@ -207,6 +208,7 @@ var IDAstar = function(first) {
 	
 	var stepCount = 0;
 	var step = function() {
+		stepCount++;
 		if (open.length === 0) {
 			++cutoff;
 			open = [first];
