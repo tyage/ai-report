@@ -160,7 +160,6 @@ var Astar = function(first) {
 	
 	var stepCount = 0;
 	var step = function() {
-		stepCount++;
 		if (open.length === 0) {
 			return true;
 		}
@@ -178,6 +177,7 @@ var Astar = function(first) {
 			});
 			if (pieces && (!s.parent || !s.parent.matchPieces(pieces))) {
 				var child = new Puzzle(pieces, s.distance + 1);
+				stepCount++;
 				child.stepCount = stepCount;
 				child.parent = s;
 				s.children.push(child);
@@ -208,7 +208,6 @@ var IDAstar = function(first) {
 	
 	var stepCount = 0;
 	var step = function() {
-		stepCount++;
 		if (open.length === 0) {
 			++cutoff;
 			open = [first];
@@ -228,6 +227,7 @@ var IDAstar = function(first) {
 				});
 				var child = new Puzzle(pieces, s.distance + 1);
 				if (pieces && (!s.parent || !s.parent.matchPieces(pieces)) && child.f() <= cutoff) {
+					stepCount++;
 					child.stepCount = stepCount;
 					child.parent = s;
 					s.children.push(child);
